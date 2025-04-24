@@ -1,0 +1,227 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum Genero {
+  MASCULINO
+  FEMENINO
+  OTRO
+}
+
+enum Roles {
+  HOST
+  RENTER
+  DRIVER
+}
+
+model Usuario {
+  id               Int              @id @default(autoincrement())
+  nombre           String
+  correo           String           @unique
+  fecha_nacimiento DateTime
+  genero           String
+  id_ciudad        Int
+  ciudad           Ciudad           @relation(fields: [id_ciudad], references: [id])
+  contraseña       String?
+  google_id        String?
+  foto             String?
+  telefono         String
+  roles            UsuarioRol[]
+  favoritos        Favorito[]
+  calificaciones   Calificacion[]
+  notificaciones   Notificacion[]
+  reservas         Reserva[]
+  carros           Carro[]          @relation("CarrosPorUsuario")
+  busquedas        Busqueda[]
+  calificacionesHechas    CalificacionHostUsuario[] @relation("Calificador")
+  calificacionesRecibidas CalificacionHostUsuario[] @relation("Calificado")
+}
+
+
+model UsuarioRol {
+  id         Int         @id @default(autoincrement())
+  id_rol     Int
+  id_usuario Int
+  usuario    Usuario     @relation(fields: [id_usuario], references: [id])
+  rol        Rol         @relation(fields: [id_rol], references: [id])
+  favoritos  Favorito[]
+}
+
+model Rol {
+  id      Int          @id @default(autoincrement())
+  rol     String
+  usuarios UsuarioRol[]
+}
+
+model Favorito {
+  id              Int         @id @default(autoincrement())
+  id_usuario_rol  Int
+  id_carro        Int
+  usuarioRol      UsuarioRol  @relation(fields: [id_usuario_rol], references: [id])
+  carro           Carro       @relation(fields: [id_carro], references: [id])
+  id_usuario      Int?
+  usuario         Usuario?    @relation(fields: [id_usuario], references: [id])
+}
+
+model Notificacion {
+  id              Int         @id @default(autoincrement())
+  id_usuario_rol  Int
+  mensaje         String
+  usuario         Usuario   @relation(fields: [id_usuario_rol], references: [id])
+}
+
+model Carro {
+  id                  Int                     @id @default(autoincrement())
+  vim                 String
+  año                 Int
+  marca               String
+  modelo              String
+  placa               String
+  id_direccion        Int
+  direccion           Direccion              @relation(fields: [id_direccion], references: [id])
+  asientos            Int
+  puertas             Int
+  soat                Boolean
+  precio_por_dia      Float
+  num_mantenimientos  Int
+  transmicion         String
+  estado              String
+  id_usuario_rol      Int
+  usuario             Usuario?               @relation("CarrosPorUsuario", fields: [id_usuario_rol], references: [id])
+  combustibles        Combustible[]
+  caracteristicas     CarasteristicasAdicionales[]
+  imagenes            Imagen[]
+  favoritos           Favorito[]
+  calificaciones      Calificacion[]
+  reservas            Reserva[]
+}
+
+model Combustible {
+  id             Int    @id @default(autoincrement())
+  tipoDeCombustible String
+  id_carro       Int
+  carro          Carro  @relation(fields: [id_carro], references: [id])
+}
+
+model CarasteristicasAdicionales {
+  id        Int    @id @default(autoincrement())
+  nombre    String
+  id_carro  Int
+  carro     Carro  @relation(fields: [id_carro], references: [id])
+}
+
+model Imagen {
+  id        Int    @id @default(autoincrement())
+  url       String
+  id_carro  Int
+  carro     Carro  @relation(fields: [id_carro], references: [id])
+}
+
+model Calificacion {
+  id             Int         @id @default(autoincrement())
+  id_usuario_rol Int
+  calf_carro     Int
+  calf_usuario   Int
+  id_carro       Int
+  id_usuario     Int
+  carro          Carro       @relation(fields: [id_carro], references: [id])
+  usuario        Usuario?    @relation(fields: [id_usuario], references: [id])
+}
+
+model Reserva {
+  id             Int         @id @default(autoincrement())
+  id_carro       Int
+  id_usuario     Int
+  fecha_creacion DateTime @default(now())
+  fecha_inicio   DateTime
+  fecha_fin      DateTime
+  fecha_expiracion DateTime?
+  estado         String @default("pendiente")
+  id_descuento   Int?
+  carro          Carro       @relation(fields: [id_carro], references: [id])
+  descuento      Descuento?  @relation(fields: [id_descuento], references: [id])
+  usuario        Usuario?    @relation(fields: [id_usuario], references: [id])
+
+  CalificacionHostUsuario CalificacionHostUsuario[]
+}
+
+model Descuento {
+  id         Int       @id @default(autoincrement())
+  fecha      DateTime
+  porcentaje Float
+  reservas   Reserva[]
+}
+
+model Garantia {
+  id           Int       @id @default(autoincrement())
+  precio       Float
+  fecha_limite DateTime
+  pagado       Boolean
+}
+
+model Ciudad {
+  id      Int      @id @default(autoincrement())
+  nombre  String
+  usuarios Usuario[]
+  direcciones Direccion[]
+}
+
+model Pais {
+  id         Int         @id @default(autoincrement())
+  nombre     String
+  direcciones Direccion[]
+}
+
+model Direccion {
+  id          Int      @id @default(autoincrement())
+  id_ciudad   Int
+  id_pais     Int
+  id_provincia Int
+  direccion   String
+  num_casa    String
+  ciudad      Ciudad   @relation(fields: [id_ciudad], references: [id])
+  pais        Pais     @relation(fields: [id_pais], references: [id])
+  provincia   Provincia @relation(fields: [id_provincia], references: [id])
+  carros      Carro[]
+}
+
+model Provincia {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  direcciones Direccion[]
+}
+
+model Busqueda {
+  id              Int       @id @default(autoincrement())
+  criterio        String
+  fecha_creacion  DateTime  @default(now())
+  id_usuario      Int
+  usuario         Usuario   @relation(fields: [id_usuario], references: [id])
+}
+model CalificacionHostUsuario {
+  id                Int       @id @default(autoincrement())
+  comportamiento    Int       // Calificación del comportamiento
+  cuidadovehiculo   Int       // Calificación del cuidado del vehículo
+  puntualidad       Int       // Calificación de la puntualidad
+  comentario        String?   // Añadido campo para comentarios
+  id_reserva        Int       // Relación con la reserva
+  reserva           Reserva   @relation(fields: [id_reserva], references: [id])
+  id_calificador    Int       // Usuario que realiza la calificación
+  calificador       Usuario   @relation("Calificador", fields: [id_calificador], references: [id])
+  id_calificado     Int       // Usuario que recibe la calificación
+  calificado        Usuario   @relation("Calificado", fields: [id_calificado], references: [id])
+  fecha_creacion    DateTime  @default(now()) // Fecha de creación de la calificación
+}
+

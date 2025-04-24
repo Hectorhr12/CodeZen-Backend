@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "nodemon --watch src --exec node src/index.js",
-    "build": "next build"
+    "build": "prisma generate && your-other-build-commands"
   },
   "keywords": [],
   "author": "",
@@ -13,9 +13,6 @@
   "type": "module",
   "description": "",
   "dependencies": {
-    "next": "^13.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",  
     "@prisma/client": "^6.6.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
@@ -23,6 +20,7 @@
     "prisma": "^6.6.0"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.9"
   }
 }
