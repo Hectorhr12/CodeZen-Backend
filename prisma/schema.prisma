@@ -35,7 +35,10 @@ enum EstadoCarro {
   RESERVADO
   MANTENIMIENTO
 }
-
+model Aux123{
+  id         Int      @id @default(autoincrement())
+  nombre     String
+}
 model Usuario {
   id                  Int                     @id @default(autoincrement())
   nombre              String
