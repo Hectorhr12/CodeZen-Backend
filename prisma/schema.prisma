@@ -67,6 +67,12 @@ model Usuario {
   @@index([google_id])
   @@index([id_ciudad])
 }
+model Papitas{
+  id         Int      @id @default(autoincrement())
+  nombre     String
+  precio     Float
+  cantidad   Int
+}
 
 model UsuarioRol {
   id         Int         @id @default(autoincrement())
