@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,284 +7,552 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Genero {
-  MASCULINO
-  FEMENINO
-  OTRO
+model Busqueda {
+  id             Int      @id @default(autoincrement())
+  criterio       String
+  fecha_creacion DateTime @default(now())
+  id_usuario     Int
 }
 
-enum Roles {
-  HOST
-  RENTER
-  DRIVER
+model Calificacion {
+  id             Int           @id @default(autoincrement())
+  id_usuario_rol Int
+  calf_carro     Int?
+  calf_usuario   Int?
+  id_carro       Int
+  id_usuario     Int
+  Carro          Carro         @relation(fields: [id_carro], references: [id])
+  Usuario        Usuario       @relation(fields: [id_usuario], references: [id])
+  comentarios    comentarios[]
 }
 
-enum EstadoReserva {
+model CarasteristicasAdicionales {
+  id                              Int                               @id @default(autoincrement())
+  nombre                          String
+  caracteristicasAdicionalesCarro caracteristicasAdicionalesCarro[]
+}
+
+model Carro {
+  id                              Int                               @id @default(autoincrement())
+  vim                             String
+  año                             Int                               @map("año")
+  marca                           String
+  modelo                          String
+  placa                           String
+  id_direccion                    Int
+  asientos                        Int
+  puertas                         Int
+  soat                            Boolean
+  precio_por_dia                  Float
+  num_mantenimientos              Int
+  transmicion                     String
+  estado                          String
+  id_usuario_rol                  Int
+  descripcion                     String?
+  NumeroViajes                    Int?                              @default(0)
+  ingresoTotal                    Float?                            @default(0)
+  id_tipodeDescuento              Int?
+  fecha_ingreso                   DateTime?                         @default(now())
+  disponible_desde                DateTime?
+  disponible_hasta                DateTime?
+  id_condiciones_uso              Int?                              @unique(map: "uq_carro_condiciones_uso")
+  notificaion_confirmacion_id     Int?
+  calificacionpromedio            Float?                            @default(0)
+  Calificacion                    Calificacion[]
+  condiciones_uso                 condiciones_uso?                  @relation(fields: [id_condiciones_uso], references: [id])
+  Direccion                       Direccion                         @relation(fields: [id_direccion], references: [id])
+  tipodeDescuento                 tipodeDescuento?                  @relation(fields: [id_tipodeDescuento], references: [id])
+  Usuario                         Usuario                           @relation(fields: [id_usuario_rol], references: [id])
+  CombustibleCarro                CombustibleCarro[]
+  Favorito                        Favorito[]
+  Imagen                          Imagen[]
+  Reserva                         Reserva[]
+  SeguroCarro                     SeguroCarro[]
+  caracteristicasAdicionalesCarro caracteristicasAdicionalesCarro[]
+  comentarios                     comentarios[]
+  contratodeAlquiler              contratodeAlquiler[]
+  OrdenPago                       OrdenPago[]
+  Comentarios                     ComentarioCarro[]
+}
+
+model Ciudad {
+  id         Int          @id @default(autoincrement())
+  nombre     String
+  id_pais    Int?
+  Pais       Pais?        @relation(fields: [id_pais], references: [id])
+  Provincia  Provincia[]
+  Usuario    Usuario[]
+  aeropuerto aeropuerto[]
+}
+
+model CombustibleCarro {
+  id              Int             @id @default(autoincrement())
+  id_carro        Int
+  id_combustible  Int
+  Carro           Carro           @relation(fields: [id_carro], references: [id])
+  TipoCombustible TipoCombustible @relation(fields: [id_combustible], references: [id])
+}
+
+model Descuento {
+  id               Int              @id @default(autoincrement())
+  id_descuentoTipo Int?
+  montoDescontado  Float?
+  tipodeDescuento  tipodeDescuento? @relation(fields: [id_descuentoTipo], references: [id])
+  Reserva          Reserva[]
+}
+
+model Direccion {
+  id           Int         @id @default(autoincrement())
+  id_provincia Int
+  num_casa     String?
+  calle        String
+  zona         String?
+  latitud      Float?
+  longitud     Float?
+  Carro        Carro[]
+  Provincia    Provincia   @relation(fields: [id_provincia], references: [id])
+  Ubicacion    Ubicacion[]
+}
+
+model Favorito {
+  id             Int        @id @default(autoincrement())
+  id_usuario_rol Int
+  id_carro       Int
+  id_usuario     Int?
+  Carro          Carro      @relation(fields: [id_carro], references: [id])
+  Usuario        Usuario?   @relation(fields: [id_usuario], references: [id])
+  UsuarioRol     UsuarioRol @relation(fields: [id_usuario_rol], references: [id])
+}
+
+model Garantia {
+  id           Int      @id @default(autoincrement())
+  precio       Float
+  fecha_limite DateTime
+  pagado       Boolean
+  descripcion  String?
+  id_reserva   Int?
+  pagoPorDaños Boolean? @map("pagoPorDaños")
+  Reserva      Reserva? @relation(fields: [id_reserva], references: [id])
+}
+
+model Imagen {
+  id        Int     @id @default(autoincrement())
+  id_carro  Int
+  data      String?
+  format    String?
+  height    Int?
+  public_id String?
+  width     Int?
+  Carro     Carro   @relation(fields: [id_carro], references: [id])
+}
+
+
+
+model Notificacion {
+  id             Int     @id @default(autoincrement())
+  id_usuario_rol Int
+  mensaje        String
+  Usuario        Usuario @relation(fields: [id_usuario_rol], references: [id])
+}
+
+model Pais {
+  id     Int      @id @default(autoincrement())
+  nombre String
+  Ciudad Ciudad[]
+}
+
+model PasswordRecoveryCode {
+  id         Int      @id @default(autoincrement())
+  id_usuario Int
+  correo     String
+  codigo     String
+  created_at DateTime @default(now())
+  expires_at DateTime
+  used       Boolean  @default(false)
+  usuario    Usuario  @relation(fields: [id_usuario], references: [id])
+}
+
+model Provincia {
+  id        Int         @id @default(autoincrement())
+  nombre    String
+  id_ciudad Int
+  Direccion Direccion[]
+  Ciudad    Ciudad      @relation(fields: [id_ciudad], references: [id])
+}
+
+model Reserva {
+  id                     Int         @id @default(autoincrement())
+  id_carro               Int
+  id_usuario             Int
+  estado                 String      @default("pendiente")
+  fecha_creacion         DateTime    @default(now())
+  fecha_expiracion       DateTime?
+  fecha_fin              DateTime?
+  fecha_inicio           DateTime
+  hora_fin               Int?
+  hora_inicio            Int?
+  kilometraje            Int?
+  montoPagoInicial       Float?
+  montoTotalConDescuento Float?
+  Garantia               Garantia[]
+  Carro                  Carro       @relation(fields: [id_carro], references: [id])
+  Usuario                Usuario     @relation(fields: [id_usuario], references: [id])
+  Descuento              Descuento[]
+  reservasConductor      ReservaConductor[]
+  Estado                 EstadoReserva @default(PENDIENTE)
+  calificaciones         CalificacionReserva[]
+}
+
+enum EstadoOrden {
   PENDIENTE
-  CONFIRMADA
-  EN_CURSO
-  COMPLETADA
+  PROCESANDO
+  COMPLETADO
+  CANCELADO
+}
+
+model OrdenPago {
+  id                            Int             @id @default(autoincrement())
+  codigo                        String          @unique
+  id_usuario_host               Int
+  id_usuario_renter             Int
+  id_carro                      Int
+  fecha_de_emision              DateTime        @default(now())
+  monto_a_pagar                 Float
+  estado                        EstadoOrden     @default(PENDIENTE)
+  host                          Usuario         @relation("HostOrders", fields: [id_usuario_host], references: [id])
+  renter                        Usuario         @relation("RenterOrders", fields: [id_usuario_renter], references: [id])
+  carro                         Carro           @relation(fields: [id_carro], references: [id])
+  ComprobanteDePago            ComprobanteDePago[]
+}
+
+model ComprobanteDePago {
+  id                   Int      @id @default(autoincrement())
+  fecha_emision        DateTime @default(now())
+  id_orden             Int
+  numero_transaccion   String
+  OrdenPago            OrdenPago @relation(fields: [id_orden], references: [id])
+}
+
+model Rol {
+  id         Int          @id @default(autoincrement())
+  rol        String
+  UsuarioRol UsuarioRol[]
+}
+
+model Seguro {
+  id          Int           @id @default(autoincrement())
+  empresa     String
+  nombre      String
+  tipoSeguro  String
+  SeguroCarro SeguroCarro[]
+}
+
+model SeguroCarro {
+  id          Int          @id @default(autoincrement())
+  fechaInicio DateTime
+  fechaFin    DateTime
+  id_carro    Int
+  id_seguro   Int
+  enlace      String?      @db.VarChar(255) 
+  enlaceSeguro String?  
+  Carro       Carro        @relation(fields: [id_carro], references: [id])
+  Seguro      Seguro       @relation(fields: [id_seguro], references: [id])
+  tiposeguro  tiposeguro[]
+}
+
+model TipoCombustible {
+  id                Int                @id @default(autoincrement())
+  tipoDeCombustible String
+  id_carro          Int
+  CombustibleCarro  CombustibleCarro[]
+}
+
+model Ubicacion {
+  id              Int       @id @default(autoincrement())
+  id_direccion    Int
+  coordenadas     Json
+  radio_cobertura Int       @default(5000)
+  Direccion       Direccion @relation(fields: [id_direccion], references: [id])
+}
+
+enum EstadoConductor {
+  NO_REQUESTED
+  PENDING
+  APPROVED
+}
+
+model Usuario {
+  id               Int              @id @default(autoincrement())             
+  nombre           String
+  correo           String           @unique
+  fecha_nacimiento DateTime?
+  genero           Genero?
+  id_ciudad        Int?
+  ciudad           Ciudad?           @relation(fields: [id_ciudad], references: [id])
+  contraseña       String?
+  google_id       String?
+  foto            String?
+  telefono         String?
+  ocupacion           String?
+  fecha_creacion      DateTime?                @default(now())
+  fecha_actualizacion DateTime?                @updatedAt
+  saldo            Float       @default(0)
+  busquedas        String?
+  roles            UsuarioRol[]
+  favoritos        Favorito[]
+  calificaciones   Calificacion[]
+  notificaciones   Notificacion[]
+  reservas         Reserva[]
+  carros           Carro[]
+  recoveryCode  PasswordRecoveryCode[]
+  comentarios          comentarios[]
+  ordenesPagoHost   OrdenPago[] @relation("HostOrders")
+  ordenesPagoRenter OrdenPago[] @relation("RenterOrders")
+  estadoConductor EstadoConductor? @default(NO_REQUESTED)
+  solicitudesConductor  SolicitudConductor[]
+  licenciasConducir LicenciaConducir[]
+  reservasConductor ReservaConductor[]
+  asociacionesComoRenter  Asociacion[]        @relation("RenterAsociaciones")
+  asociacionesComoDriver  Asociacion[]        @relation("DriverAsociaciones")
+  solicitudesEnviadas     SolicitudAsociacion[] @relation("SolicitanteSolicitudes")
+  solicitudesRecibidas    SolicitudAsociacion[] @relation("ReceptorSolicitudes")
+  Comentarios         ComentarioCarro[]
+  reportesRecibidos   Reporte[] @relation("ReportesRecibidos")
+  reportesCreados     Reporte[] @relation("ReportesCreados")
+}
+
+model SolicitudConductor {
+  id                Int       @id @default(autoincrement())
+  usuarioId         Int
+  usuario           Usuario   @relation(fields: [usuarioId], references: [id])
+  front             String
+  back              String
+  estado            EstadoSolicitud @default(PENDIENTE)
+  categoria         CategoriaLicencia
+  numeroLicencia    String
+  fechaEmision      DateTime
+  fechaVencimiento  DateTime
+  createdAt         DateTime  @default(now())
+}
+
+model LicenciaConducir {
+  id               Int               @id @default(autoincrement())
+  usuarioId        Int
+  usuario          Usuario           @relation(fields: [usuarioId], references: [id])
+  numeroLicencia   String
+  fechaEmision     DateTime
+  fechaVencimiento DateTime
+  categoria        CategoriaLicencia
+  estado           EstadoLicencia   @default(ACTIVA)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+enum EstadoLicencia {
+  ACTIVA
+  VENCIDA
+  SUSPENDIDA
+}
+
+
+
+enum EstadoSolicitud {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+}
+
+enum CategoriaLicencia {
+  M
+  P
+  A
+  B
+  C
+  T
+}
+enum TipoSolicitudAsociacion {
+  RENTER_A_DRIVER
+  DRIVER_A_RENTER
+}
+
+enum EstadoSolicitudAsociacion {
+  PENDIENTE
+  ACEPTADA
+  RECHAZADA
   CANCELADA
 }
 
-enum EstadoCarro {
-  DISPONIBLE
-  RESERVADO
-  MANTENIMIENTO
-}
-model Aux123{
-  id         Int      @id @default(autoincrement())
-  nombre     String
-}
-model Usuario {
+model SolicitudAsociacion {
   id                  Int                     @id @default(autoincrement())
-  nombre              String
-  correo              String                  @unique
-  fecha_nacimiento    DateTime?
-  genero              Genero?
-  id_ciudad           Int?
-  ciudad              Ciudad?                 @relation(fields: [id_ciudad], references: [id])
-  contraseña          String?
-  google_id           String? @unique
-  foto                String?
-  telefono            String?
-  ocupacion           String?
-  fecha_creacion      DateTime                @default(now())
-  fecha_actualizacion DateTime                @updatedAt
-  roles               UsuarioRol[]
-  favoritos           Favorito[]
-  calificaciones      Calificacion[]
-  notificaciones      Notificacion[]
-  reservas            Reserva[]
-  carros              Carro[]                 @relation("CarrosPorUsuario")
-  busquedas           Busqueda[]
-  recoveryCode        PasswordRecoveryCode[]
-  comentarios         ComentarioCarro[]
-  reportes            Reporte[]               @relation("ReportesCreados")
-  reportesRecibidos   Reporte[]               @relation("ReportesRecibidos")
+  solicitanteId       Int
+  receptorId          Int
+  tipo                TipoSolicitudAsociacion
+  mensaje             String?                 @db.VarChar(150)
+  estado              EstadoSolicitud         @default(PENDIENTE)
+  fechaSolicitud      DateTime                @default(now())
+  fechaRespuesta      DateTime?
 
-  @@index([correo])
-  @@index([google_id])
-  @@index([id_ciudad])
+
+  solicitante         Usuario                 @relation("SolicitanteSolicitudes", fields: [solicitanteId], references: [id])
+  receptor           Usuario                 @relation("ReceptorSolicitudes", fields: [receptorId], references: [id])
 }
-model Papitas{
-  id         Int      @id @default(autoincrement())
-  nombre     String
-  precio     Float
-  cantidad   Int
+
+model Asociacion {
+  id              Int                   @id @default(autoincrement())
+  renterId        Int
+  driverId        Int
+  fechaInicio     DateTime              @default(now())
+  activa          Boolean               @default(true)
+  
+  renter          Usuario               @relation("RenterAsociaciones", fields: [renterId], references: [id])
+  driver          Usuario               @relation("DriverAsociaciones", fields: [driverId], references: [id])
 }
 
 model UsuarioRol {
   id         Int         @id @default(autoincrement())
   id_rol     Int
   id_usuario Int
-  usuario    Usuario     @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+  usuario    Usuario     @relation(fields: [id_usuario], references: [id])
   rol        Rol         @relation(fields: [id_rol], references: [id])
   favoritos  Favorito[]
-  
-  @@index([id_usuario])
-  @@index([id_rol])
+  comentarios comentarios[]
 }
 
-model Rol {
-  id      Int          @id @default(autoincrement())
-  rol     String       @unique
-  usuarios UsuarioRol[]
-}
-
-model PasswordRecoveryCode {
-  id         Int      @id @default(autoincrement())
-  id_usuario Int
-  usuario    Usuario  @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
-  correo     String
-  codigo     String
-  created_at DateTime @default(now())
-  expires_at DateTime
-  used       Boolean  @default(false)
-  
-  @@index([id_usuario])
-  @@index([codigo])
-}
-
-model Favorito {
-  id              Int         @id @default(autoincrement())
-  id_usuario_rol  Int
-  id_carro        Int
-  usuarioRol      UsuarioRol  @relation(fields: [id_usuario_rol], references: [id], onDelete: Cascade)
-  carro           Carro       @relation(fields: [id_carro], references: [id], onDelete: Cascade)
-  id_usuario      Int?
-  usuario         Usuario?    @relation(fields: [id_usuario], references: [id], onDelete: SetNull)
-  
-  @@unique([id_usuario_rol, id_carro])
-  @@index([id_usuario_rol])
-  @@index([id_carro])
-  @@index([id_usuario])
-}
-
-model Notificacion {
-  id              Int         @id @default(autoincrement())
-  id_usuario_rol  Int
-  mensaje         String
-  leida           Boolean     @default(false)
-  fecha_creacion  DateTime    @default(now())
-  usuario         Usuario     @relation(fields: [id_usuario_rol], references: [id], onDelete: Cascade)
-  
-  @@index([id_usuario_rol])
-}
-
-model Carro {
-  id                  Int                     @id @default(autoincrement())
-  vim                 String
-  anio                Int
-  marca               String
-  modelo              String
-  placa               String                  @unique
-  id_direccion        Int
-  direccion           Direccion               @relation(fields: [id_direccion], references: [id])
-  fecha_ingreso       DateTime?               @default(now())
-  asientos            Int
-  puertas             Int
-  soat                Boolean
-  precio_por_dia      Float
-  num_mantenimientos  Int
-  transmision         String
-  estado              EstadoCarro             @default(DISPONIBLE)
-  id_usuario_rol      Int
-  descripcion         String?
-  ingresoTotal        Float?                  @default(0)
-  NumeroViajes        Int?                    @default(0)
-  color               String?
-  usuario             Usuario?                @relation("CarrosPorUsuario", fields: [id_usuario_rol], references: [id])
-  id_tipodeDescuento  Int?
-  tipodeDescuento     tipodeDescuento?        @relation(fields: [id_tipodeDescuento], references: [id])
-  disponible_desde    DateTime?
-  disponible_hasta    DateTime?
-  combustiblesporCarro CombustibleCarro[]
-  caracteristicasAdicionalesCarro caracteristicasAdicionalesCarro[]
-  contratosAlquiler   contratodeAlquiler[]
-  imagenes            Imagen[]
-  favoritos           Favorito[]
-  calificaciones      Calificacion[]
-  reservas            Reserva[]
-  seguroCarro         SeguroCarro[]
-  comentarios         ComentarioCarro[]
-
-  @@index([marca, modelo])
-  @@index([id_direccion])
-  @@index([id_usuario_rol])
-  @@index([id_tipodeDescuento])
-  @@index([estado])
-}
-
-model SeguroCarro {
-  id             Int       @id @default(autoincrement())
-  fechaInicio    DateTime
-  fechaFin       DateTime
-  id_carro       Int
-  carro          Carro     @relation(fields: [id_carro], references: [id], onDelete: Cascade)
-  id_seguro      Int
-  seguro         Seguro    @relation(fields: [id_seguro], references: [id])
-  
-  @@index([id_carro])
-  @@index([id_seguro])
-}
-
-model Seguro {
-  id                  Int           @id @default(autoincrement())
-  nombre              String
-  tipoSeguro          String
-  empresa             String
-  seguroCarro         SeguroCarro[]
-}
-
-model CombustibleCarro {
-  id             Int             @id @default(autoincrement())
-  id_carro       Int
-  carro          Carro           @relation(fields: [id_carro], references: [id], onDelete: Cascade)
-  id_combustible Int
-  combustible    TipoCombustible @relation(fields: [id_combustible], references: [id])
-  
-  @@index([id_carro])
-  @@index([id_combustible])
-}
-
-model TipoCombustible {
-  id                 Int                @id @default(autoincrement())
-  tipoDeCombustible  String
-  id_carro           Int
-  combustibleCarro   CombustibleCarro[]
+model aeropuerto {
+  id        Int    @id @default(autoincrement())
+  nombre    String
+  latitud   Float?
+  longitud  Float?
+  id_ciudad Int
+  Ciudad    Ciudad @relation(fields: [id_ciudad], references: [id])
 }
 
 model caracteristicasAdicionalesCarro {
   id                            Int                        @id @default(autoincrement())
   id_carro                      Int
-  carro                         Carro                      @relation(fields: [id_carro], references: [id], onDelete: Cascade)
   id_carasteristicasAdicionales Int
-  carasteristicasAdicionales    CarasteristicasAdicionales @relation(fields: [id_carasteristicasAdicionales], references: [id])
-  
-  @@index([id_carro])
-  @@index([id_carasteristicasAdicionales])
+  CarasteristicasAdicionales    CarasteristicasAdicionales @relation(fields: [id_carasteristicasAdicionales], references: [id])
+  Carro                         Carro                      @relation(fields: [id_carro], references: [id])
 }
 
-model CarasteristicasAdicionales {
-  id                            Int                             @id @default(autoincrement())
-  nombre                        String
-  caracteristicasAdicionalesCarro caracteristicasAdicionalesCarro[]
+model comentarios {
+  id                      Int           @id @default(autoincrement())
+  contenido               String?
+  id_comentariorespondido Int?
+  comentado_en            DateTime?     @default(now()) @db.Timestamp(6)
+  id_usuario              Int?
+  id_usuariorol           Int?
+  id_carro                Int?
+  id_calificacion         Int?
+  likes                   Int?
+  dont_likes              Int?
+  comentarios             comentarios?  @relation("comentariosTocomentarios", fields: [id_comentariorespondido], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_comentarios       comentarios[] @relation("comentariosTocomentarios")
+  Usuario                 Usuario?      @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  UsuarioRol              UsuarioRol?   @relation(fields: [id_usuariorol], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Calificacion            Calificacion? @relation(fields: [id_calificacion], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "id_calificacion")
+  Carro                   Carro?        @relation(fields: [id_carro], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "id_carro")
 }
 
-model Imagen {
-  id         Int     @id @default(autoincrement())
-  data       String?
-  public_id  String?
-  width      Int?
-  height     Int?
-  format     String?
-  id_carro   Int
-  Carro      Carro   @relation(fields: [id_carro], references: [id], onDelete: Cascade)
-  
-  @@index([id_carro])
+model condiciones_generales {
+  id                  Int              @id @default(autoincrement())
+  edad_minima         Int
+  edad_maxima         Int
+  kilometraje_max_dia Float
+  fumar               Boolean
+  mascota             Boolean
+  dev_mismo_conb      Boolean
+  uso_fuera_ciudad    Boolean
+  multa_conductor     Boolean
+  dev_mismo_lugar     Boolean
+  uso_comercial       Boolean
+  condiciones_uso     condiciones_uso?
 }
 
-model Calificacion {
-  id             Int      @id @default(autoincrement())
-  id_usuario_rol Int
-  calf_carro     Int?
-  calf_usuario   Int?
-  comentario     String?
-  id_carro       Int
-  id_usuario     Int
-  fecha_creacion DateTime @default(now())
-  carro          Carro    @relation(fields: [id_carro], references: [id], onDelete: Cascade)
-  usuario        Usuario? @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
-  
-  @@index([id_carro])
-  @@index([id_usuario])
+model condiciones_uso {
+  id                       Int                    @id @default(autoincrement())
+  id_condiciones_generales Int?                   @unique
+  id_devolucion_auto       Int?                   @unique
+  id_entrega_auto          Int?                   @unique
+  Carro                    Carro?
+  condiciones_generales    condiciones_generales? @relation(fields: [id_condiciones_generales], references: [id])
+  devolucion_auto          devolucion_auto?       @relation(fields: [id_devolucion_auto], references: [id])
+  entrega_auto             entrega_auto?          @relation(fields: [id_entrega_auto], references: [id])
 }
 
-model Reserva {
-  id                     Int           @id @default(autoincrement())
-  id_carro               Int
-  id_usuario             Int
-  kilometraje            Int?
-  fecha_creacion         DateTime      @default(now())
-  fecha_inicio           DateTime
-  montoPagoInicial       Float?
-  montoTotalConDescuento Float?
-  hora_inicio            Int?
-  hora_fin               Int?
-  fecha_fin              DateTime?
-  fecha_expiracion       DateTime?
-  estado                 EstadoReserva @default(PENDIENTE)
-  carro                  Carro         @relation(fields: [id_carro], references: [id], onDelete: Cascade)
-  usuario                Usuario?      @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
-  garantia               Garantia[]
-  descuento              Descuento[]
-  calificaciones         CalificacionReserva[]
-  
-  @@index([id_carro])
-  @@index([id_usuario])
-  @@index([fecha_inicio, fecha_fin])
-  @@index([estado])
+model contratodeAlquiler {
+  id          Int    @id @default(autoincrement())
+  id_reserva  Int
+  kilometraje Int
+  id_carro    Int
+  estado      String @default("pendiente")
+  Carro       Carro  @relation(fields: [id_carro], references: [id])
+}
+
+model devolucion_auto {
+  id                Int              @id @default(autoincrement())
+  interior_limpio   Boolean
+  exterior_limpio   Boolean
+  rayones           Boolean
+  herramientas      Boolean
+  cobrar_daños      Boolean          @map("cobrar_daños")
+  combustible_igual Boolean
+  condiciones_uso   condiciones_uso?
+}
+
+model entrega_auto {
+  id                 Int              @id @default(autoincrement())
+  estado_combustible String           @db.VarChar(255)
+  esterior_limpio    Boolean
+  inter_limpio       Boolean
+  rayones            Boolean
+  llanta_estado      Boolean
+  interior_daño      Boolean          @map("interior_daño")
+  condiciones_uso    condiciones_uso?
+}
+
+model herramientas_basicas {
+  id              Int    @id @default(autoincrement())
+  nombre          String @db.VarChar(255)
+  cantidad        Float
+  id_entrega_auto Int
+}
+
+model notificaion_confirmacion {
+  id        Int       @id(map: "notificacion_pkey") @default(autoincrement())
+  mensaje   String
+  fecha     DateTime? @default(now()) @db.Timestamp(6)
+  estado    Boolean?
+  id_renter Int?
+  id_host   Int?
+}
+
+model tipodeDescuento {
+  id           Int         @id @default(autoincrement())
+  nombre       String
+  porcentaje   Float
+  fecha_inicio DateTime?
+  fecha_fin    DateTime?
+  Carro        Carro[]
+  Descuento    Descuento[]
+}
+
+model tiposeguro {
+  id             Int          @id @default(autoincrement())
+  tipodaño       String?      @map("tipodaño") @db.VarChar(255)
+  descripcion    String?
+  segurocarro_id Int?
+  valides      String?      @db.VarChar(255)
+  cantidadCobertura        String?      @db.VarChar(255)
+  SeguroCarro    SeguroCarro? @relation(fields: [segurocarro_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ReservaConductor {
+  id          Int      @id @default(autoincrement())
+  id_reserva  Int
+  id_usuario  Int
+  Reserva     Reserva   @relation(fields: [id_reserva], references: [id])
+  Usuario     Usuario   @relation(fields: [id_usuario], references: [id])
 }
 
 model CalificacionReserva {
@@ -301,124 +566,6 @@ model CalificacionReserva {
   fecha_creacion    DateTime @default(now())
   
   @@index([id_reserva])
-}
-
-model Descuento {
-  id               Int              @id @default(autoincrement())
-  montoDescontado  Float?
-  id_descuentoTipo Int?
-  tipodeDescuento  tipodeDescuento? @relation(fields: [id_descuentoTipo], references: [id])
-  reservas         Reserva[]
-  
-  @@index([id_descuentoTipo])
-}
-
-model tipodeDescuento {
-  id           Int        @id @default(autoincrement())
-  nombre       String
-  porcentaje   Float
-  fecha_inicio DateTime?
-  fecha_fin    DateTime?
-  descuentos   Descuento[]
-  carros       Carro[]
-}
-
-model Garantia {
-  id           Int       @id @default(autoincrement())
-  precio       Float
-  fecha_limite DateTime
-  descripcion  String?
-  pagado       Boolean
-  pagoPorDanos Boolean?
-  id_reserva   Int?
-  reserva      Reserva?  @relation(fields: [id_reserva], references: [id], onDelete: SetNull)
-  
-  @@index([id_reserva])
-}
-
-model contratodeAlquiler {
-  id             Int     @id @default(autoincrement())
-  id_reserva     Int
-  kilometraje    Int
-  id_carro       Int
-  carro          Carro   @relation(fields: [id_carro], references: [id], onDelete: Cascade)
-  estado         String  @default("pendiente")
-  
-  @@index([id_carro])
-}
-
-model Ciudad {
-  id          Int         @id @default(autoincrement())
-  nombre      String
-  pais        Pais?       @relation(fields: [id_pais], references: [id])
-  id_pais     Int?
-  usuarios    Usuario[]
-  provincia   Provincia[]
-  aeropuerto  aeropuerto[]
-  
-  @@index([id_pais])
-}
-
-model aeropuerto {
-  id        Int    @id @default(autoincrement())
-  nombre    String
-  latitud   Float?
-  longitud  Float?
-  ciudad    Ciudad @relation(fields: [id_ciudad], references: [id], onDelete: Cascade)
-  id_ciudad Int
-  
-  @@index([id_ciudad])
-}
-
-model Pais {
-  id         Int      @id @default(autoincrement())
-  nombre     String
-  ciudad     Ciudad[]
-}
-
-model Direccion {
-  id           Int        @id @default(autoincrement())
-  id_provincia Int
-  calle        String
-  zona         String?
-  num_casa     String?
-  latitud      Float?
-  longitud     Float?
-  provincia    Provincia  @relation(fields: [id_provincia], references: [id])
-  carros       Carro[]
-  ubicacion    Ubicacion[]
-  
-  @@index([id_provincia])
-}
-
-model Ubicacion {
-  id               Int       @id @default(autoincrement())
-  direccion        Direccion @relation(fields: [id_direccion], references: [id], onDelete: Cascade)
-  id_direccion     Int
-  coordenadas      Json      
-  radio_cobertura  Int       @default(5000)
-  
-  @@index([id_direccion])
-}
-
-model Provincia {
-  id        Int         @id @default(autoincrement())
-  nombre    String
-  ciudad    Ciudad      @relation(fields: [id_ciudad], references: [id], onDelete: Cascade)   
-  id_ciudad Int
-  direcciones Direccion[]
-  
-  @@index([id_ciudad])
-}
-
-model Busqueda {
-  id              Int       @id @default(autoincrement())
-  criterio        String
-  fecha_creacion  DateTime  @default(now())
-  id_usuario      Int
-  usuario         Usuario   @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
-  
-  @@index([id_usuario])
 }
 
 model ComentarioCarro {
@@ -437,6 +584,7 @@ model ComentarioCarro {
   @@index([id_usuario])
 }
 
+
 model Reporte {
   id              Int         @id @default(autoincrement())
   id_reportado    Int        
@@ -447,9 +595,37 @@ model Reporte {
   fecha_creacion  DateTime    @default(now())
   fecha_actualizacion DateTime @updatedAt
   
-  reportado       Usuario     @relation("ReportesRecibidos", fields: [id_reportado], references: [id])
-  reportador      Usuario     @relation("ReportesCreados", fields: [id_reportador], references: [id])
+  reportado       Usuario?     @relation("ReportesRecibidos", fields: [id_reportado], references: [id])
+  reportador      Usuario?     @relation("ReportesCreados", fields: [id_reportador], references: [id])
   
   @@index([id_reportado])
   @@index([id_reportador])
+}
+
+enum EstadoReserva {
+  PENDIENTE
+  CONFIRMADA
+  EN_CURSO
+  COMPLETADA
+  CANCELADA
+}
+
+enum EstadoCarro {
+  DISPONIBLE
+  RESERVADO
+  MANTENIMIENTO
+}
+
+
+enum Genero {
+  MASCULINO
+  FEMENINO
+  OTRO
+}
+
+enum Roles {
+  HOST
+  RENTER
+  DRIVER
+  ADMIN
 }
