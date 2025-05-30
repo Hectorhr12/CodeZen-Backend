@@ -61,7 +61,9 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1992-05-15'),
     genero: Genero.FEMENINO,
     telefono: '+591 70123456',
-    ocupacion: 'Ingeniera de Software'
+    ocupacion: 'Ingeniera de Software',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('María González Pérez')}`,
+
   },
   {
     nombre: 'Carlos Mendoza Silva',
@@ -69,7 +71,8 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1988-11-22'),
     genero: Genero.MASCULINO,
     telefono: '+591 71234567',
-    ocupacion: 'Médico Cirujano'
+    ocupacion: 'Médico Cirujano',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Carlos Mendoza Silva')}`,
   },
   {
     nombre: 'Ana Rodríguez López',
@@ -77,7 +80,9 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1995-03-08'),
     genero: Genero.FEMENINO,
     telefono: '+591 72345678',
-    ocupacion: 'Abogada'
+    ocupacion: 'Abogada',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Ana Rodríguez López')}`
+
   },
   {
     nombre: 'Luis Fernández Castro',
@@ -85,7 +90,9 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1990-07-12'),
     genero: Genero.MASCULINO,
     telefono: '+591 73456789',
-    ocupacion: 'Arquitecto'
+    ocupacion: 'Arquitecto',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Luis Fernández Castro')}`
+
   },
   {
     nombre: 'Sofia Vargas Morales',
@@ -93,7 +100,8 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1993-09-25'),
     genero: Genero.FEMENINO,
     telefono: '+591 74567890',
-    ocupacion: 'Diseñadora Gráfica'
+    ocupacion: 'Diseñadora Gráfica',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Sofia Vargas Morales')}`
   },
   {
     nombre: 'Diego Morales Quispe',
@@ -101,7 +109,8 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1987-12-03'),
     genero: Genero.MASCULINO,
     telefono: '+591 75678901',
-    ocupacion: 'Contador Público'
+    ocupacion: 'Contador Público',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Diego Morales Quispe')}`
   },
   {
     nombre: 'Valentina Cruz Mamani',
@@ -109,7 +118,8 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1994-06-18'),
     genero: Genero.FEMENINO,
     telefono: '+591 76789012',
-    ocupacion: 'Psicóloga Clínica'
+    ocupacion: 'Psicóloga Clínica',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Valentina Cruz Mamani')}`
   },
   {
     nombre: 'Roberto Silva Condori',
@@ -117,7 +127,8 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1989-04-30'),
     genero: Genero.MASCULINO,
     telefono: '+591 77890123',
-    ocupacion: 'Profesor Universitario'
+    ocupacion: 'Profesor Universitario',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent( 'Roberto Silva Condori')}`
   },
   {
     nombre: 'Camila Herrera Vega',
@@ -125,7 +136,8 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1991-08-14'),
     genero: Genero.FEMENINO,
     telefono: '+591 78901234',
-    ocupacion: 'Administradora de Empresas'
+    ocupacion: 'Administradora de Empresas',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Camila Herrera Vega')}`
   },
   {
     nombre: 'Andrés Gutiérrez Rojas',
@@ -133,7 +145,8 @@ const usuariosRentersData = [
     fecha_nacimiento: new Date('1986-02-28'),
     genero: Genero.MASCULINO,
     telefono: '+591 79012345',
-    ocupacion: 'Ingeniero Civil'
+    ocupacion: 'Ingeniero Civil',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Andrés Gutiérrez Rojas')}`
   }
 ];
 
@@ -145,7 +158,9 @@ const usuariosHostsData = [
     fecha_nacimiento: new Date('1985-07-20'),
     genero: Genero.FEMENINO,
     telefono: '+591 68123456',
-    ocupacion: 'Empresaria'
+    ocupacion: 'Empresaria',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Andrés Gutiérrez Rojas')}`
+
   },
   {
     nombre: 'Fernando Choque Apaza',
@@ -153,7 +168,8 @@ const usuariosHostsData = [
     fecha_nacimiento: new Date('1982-10-15'),
     genero: Genero.MASCULINO,
     telefono: '+591 69234567',
-    ocupacion: 'Comerciante'
+    ocupacion: 'Comerciante',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Fernando Choque Apaza')}`
   },
   {
     nombre: 'Gabriela Torrez Mendez',
@@ -161,7 +177,8 @@ const usuariosHostsData = [
     fecha_nacimiento: new Date('1990-04-12'),
     genero: Genero.FEMENINO,
     telefono: '+591 67345678',
-    ocupacion: 'Gerente de Ventas'
+    ocupacion: 'Gerente de Ventas',
+    foto:`https://ui-avatars.com/api/?name=${encodeURIComponent('Gabriela Torrez Mendez')}`
   }
 ];
 
@@ -356,7 +373,7 @@ async function main() {
       data: {
         ...userData,
         id_ciudad: ciudadAleatoria.id,
-        contraseña: 'password123',
+        contraseña: '$2b$10$2qPa21fUyak.hfVD8maAju0mmrVouIqK269oS2Vdpn2inG6S3uGZy', // Contraseña encriptada="Contra123."
         saldo: Math.floor(Math.random() * 5000) + 2000, // Saldo entre 2000-7000
       }
     });
@@ -520,7 +537,7 @@ async function main() {
         id_usuario: renterAleatorio.id,
         fecha_inicio,
         fecha_fin,
-        estado: 'completada',
+        estado: 'COMPLETADA',
         Estado: EstadoReserva.COMPLETADA, // ✅ Estado COMPLETADA
         kilometraje: Math.floor(Math.random() * 800) + 200, // 200-1000 km
         montoPagoInicial: montoTotal * 0.3, // 30% como pago inicial
